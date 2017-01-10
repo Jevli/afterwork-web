@@ -8,28 +8,72 @@
 
 <body>
     <div class="container">
-        <<div class="button" onClick=geo()>
+        <div class="button" id="button" onClick=geo()>
             Olen afterworkilla
-    </div>>
-    <div class="form" hidden>
-        <form>
-            <input list="" name="">
-            <intpu type="submit">
-        </form>
+        </div>
+        <div class="loader" id="loader"></div>
+        <div class="list" id="list">
+            <input list="venues" />
+
+            <datalist id="venues">
+            </datalist>
+        </div>
     </div>
-    </div>
+    
     <script>
-            function geo() {
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(function(location) {
-                        console.log('Lat: ', location.coords.latitude);
-                        console.log('Long: ', location.coords.longitude);
-                    });
-                } else {
-                    alert("En voi paikantaa sinua!");
-                }
+        function geo() {
+            if ("geolocation" in navigator) {
+                
+                document.getElementById("button").setAttribute("style", "display:none");
+                document.getElementById("loader").setAttribute("style", "display:inline-block");
+
+                navigator.geolocation.getCurrentPosition(function (location) {
+                    console.log("Get Venues");
+                    getVenues(location.coords);
+                });
+
+            } else {
+
+                console.log("Can't locate you!");
+
             }
-        </script>
+        }
+
+        function getVenues(coords) {
+            fetch('https://api.foursquare.com/v2/venues/search?' +
+                'client_id=U0HQLN0D3CG3OLA5KBS1NJYSLECKL2P55MKGNVFTRL2WHOSO&' +
+                'client_secret=IG420OE533IT4PFUPCKMIT3HZE2MJZKBIXET5X3CMILSW2UM&' +
+                'v=20161001&categoryId=4d4b7105d754a06376d81259&radius=50&' +
+                'll=61.496343,23.766948')
+                //'ll=' + coords.latitude + ',' + coords.longitude)
+                .then(
+                function (response) {
+                    if (response.status !== 200) {
+                        console.log('Looks like there was a problem. Status Code: ' +
+                            response.status);
+                        return;
+                    }
+
+                    response.json().then(function (data) {
+                        showPossibilities(data.response.venues);
+                    });
+                })
+                .catch(function (err) {
+                    console.log('Fetch error: ', err);
+                })
+        }
+
+        function showPossibilities(venues) {
+            venues.map((venue) => {
+                let node = document.createElement("OPTION");
+                node.setAttribute("value", venue.name);
+                document.getElementById("venues").appendChild(node);
+            });
+            document.getElementById("loader").setAttribute("style", "display:none");
+            document.getElementById("list").setAttribute("style", "display:inline-block");
+        }
+
+    </script>
 </body>
 
 </html>
