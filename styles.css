@@ -1,0 +1,31 @@
+body {
+    background-color: darkblue;
+}
+
+.container {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   position:absolute;
+   top:0;
+   bottom:0;
+   right:0;
+   left:0; 
+}
+
+.button {
+    margin: auto;
+    font-size: 3em;
+    background-color: orangered;
+    color: white;
+    padding: 0.75em;
+    border-radius: 0.75em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.button:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
