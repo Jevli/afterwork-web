@@ -13,11 +13,26 @@
         </div>
         <div class="loader" id="loader"></div>
         <div class="list" id="list">
-            <input list="venues" />
+            <div class="row">
 
-            <datalist id="venues">
-            </datalist>
+                <input list="venues" />
+                <datalist id="venues" />
+            
+            </div>
+
+            <div class="row"> 
+           
+                <div class="button" onClick=search()>
+                    Hae
+                </div>
+
+                <div class="button" onClick=save()>
+                    Rekistöröi
+                </div>
+                
+            </div>
         </div>
+        
     </div>
     
     <script>
@@ -40,12 +55,7 @@
         }
 
         function getVenues(coords) {
-            fetch('https://api.foursquare.com/v2/venues/search?' +
-                'client_id=U0HQLN0D3CG3OLA5KBS1NJYSLECKL2P55MKGNVFTRL2WHOSO&' +
-                'client_secret=IG420OE533IT4PFUPCKMIT3HZE2MJZKBIXET5X3CMILSW2UM&' +
-                'v=20161001&categoryId=4d4b7105d754a06376d81259&radius=50&' +
-                'll=61.496343,23.766948')
-                //'ll=' + coords.latitude + ',' + coords.longitude)
+            fetch('https://ym8nrjkifa.execute-api.eu-west-1.amazonaws.com/prod/venues?ll=61.496417,23.768726')
                 .then(
                 function (response) {
                     if (response.status !== 200) {
@@ -55,7 +65,7 @@
                     }
 
                     response.json().then(function (data) {
-                        showPossibilities(data.response.venues);
+                        showPossibilities(data);
                     });
                 })
                 .catch(function (err) {
@@ -69,6 +79,7 @@
                 node.setAttribute("value", venue.name);
                 document.getElementById("venues").appendChild(node);
             });
+            console.log(venues)
             document.getElementById("loader").setAttribute("style", "display:none");
             document.getElementById("list").setAttribute("style", "display:inline-block");
         }
