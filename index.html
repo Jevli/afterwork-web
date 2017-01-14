@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Afterwork location service</title>
+    
+    <link rel="icon" href="seppo_sorsa.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="seppo_sorsa.ico" type="image/x-icon"/>
+
     <link rel="stylesheet" type="text/css" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
 
-        <div class="failed" id="failed">
-        </div>
+    <div class="failed" id="failed">
+    </div>
 
     <div class="container">
         
@@ -38,7 +42,7 @@
         <div class="list" id="list">
             <div class="row">
                 <label>Paikka: </label>
-                <input list="venues" name="venues" class="venues" />
+                <input list="venues" name="venues" class="venues" id="venueSelect" />
                 <datalist id="venues"></datalist>
             </div>
             <div class="btn save" id="save" onClick=save()>
@@ -50,15 +54,17 @@
     
     <script>
         const afterworkWebservice = 'https://ym8nrjkifa.execute-api.eu-west-1.amazonaws.com/prod/'
-        const header = new Headers();
+        var userName;
+        var venuesList;
+        var header = new Headers();
         header.append('Content-Type', 'application/json')
+
 
         function login() {
             let uname = document.getElementById("uname").value
             let pwd = document.getElementById("pwd").value
 
-            document.getElementById("login").setAttribute("style", "display:none");
-            document.getElementById("loader").setAttribute("style", "display:inline-block");
+            switchState("login", "loader");
             
             fetch(afterworkWebservice + 'login?uname=' + uname + '&pwd=' + pwd, {"headers": header})
                 .then( (response) => {
@@ -69,14 +75,15 @@
                     response.json().then((data) => {
                         if (data.ApiKey) {
                             header.append('x-api-key', data.ApiKey);
+                            console.log(header);
 
-                            document.getElementById("loader").setAttribute("style", "display:none");
-                            document.getElementById("afterwork").setAttribute("style", "display:inline-block");
+                            userName = uname;
+                            
+                            switchState("loader", "afterwork");
                             document.getElementById("failed").setAttribute("style", "display:none");
 
                         } else {
-                            document.getElementById("loader").setAttribute("style", "display:none");
-                            document.getElementById("login").setAttribute("style", "display:inline-block");
+                            switchState("loader", "login");
                             document.getElementById("failed").setAttribute("style", "display:block");
                             document.getElementById("failed").innerHTML = "Login failed"
 
@@ -91,10 +98,7 @@
 
         function geo() {
             if ("geolocation" in navigator) {
-                console.log('Getting location');
-
-                document.getElementById("afterwork").setAttribute("style", "display:none");
-                document.getElementById("loader").setAttribute("style", "display:inline-block");
+                switchState("afterwork", "loader");
 
                 navigator.geolocation.getCurrentPosition(function (location) {
                     console.log("Get Venues");
@@ -128,14 +132,43 @@
         }
 
         function showPossibilities(venues) {
+            venuesList = venues;
             venues.map((venue) => {
                 let node = document.createElement("OPTION");
                 node.setAttribute("value", venue.name);
                 document.getElementById("venues").appendChild(node);
             });
-            console.log(venues)
-            document.getElementById("loader").setAttribute("style", "display:none");
-            document.getElementById("list").setAttribute("style", "display:block");
+
+            switchState("loader", "list");
+        }
+
+        function save () {
+            // TODO get vid and vname
+            let venue;
+            venuesList.map((v) => {
+                if (v.name === document.getElementById("venueSelect").value) {
+                    venue = v;
+                }
+            })
+
+            fetch(afterworkWebservice + 'save?uname=' + userName + '&vid=' + venue.id + '&vname=' + venue.name + '&city=' + venue.location.city, {"method": "POST", "headers": header})
+                .then((response) => {
+                    if (response.status !== 200) {
+                        console.log("Save error");
+                    }
+                    
+                    console.log("Onnistuis");
+                })
+                .catch((err) => {
+                    console.log('Fetch error: ', err);
+                })
+            
+            switchState("list", "afterwork");
+        }
+
+        function switchState(curr, next) {
+            document.getElementById(curr).setAttribute("style", "display:none");
+            document.getElementById(next).setAttribute("style", "display:block");
         }
 
     </script>
