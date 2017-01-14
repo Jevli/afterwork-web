@@ -157,7 +157,10 @@
                         console.log("Save error");
                     }
                     
-                    console.log("Onnistuis");
+                    response.json().then((data) =>  {
+                        console.log(data);
+                    })
+                    
                 })
                 .catch((err) => {
                     console.log('Fetch error: ', err);
