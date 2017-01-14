@@ -2,46 +2,84 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
     <title>Afterwork location service</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
     <div class="container">
-        <div class="button" id="button" onClick=geo()>
+        
+        <div class="login" id="login">
+            <div class="row">
+                <label>Käyttäjänimi: </label>
+                <input type="text" name="uname" id="uname">
+            </div>
+            <div class="row">
+                <label>Pin:</label>
+                <input type="password" name="pwd" id="pwd">
+            </div>
+            <div class="btn login" id="submit" onClick=login()>
+                Kirjaudu
+            </div> 
+        </div>
+
+        <div class="btn afterwork" id="afterwork" onClick=geo()>
             Olen afterworkilla
         </div>
+
         <div class="loader" id="loader"></div>
+
         <div class="list" id="list">
             <div class="row">
-
-                <input list="venues" />
-                <datalist id="venues" />
-            
+                <label>Paikka: </label>
+                <input list="venues" name="venues" class="venues" />
+                <datalist id="venues"></datalist>
             </div>
-
-            <div class="row"> 
-           
-                <div class="button" onClick=search()>
-                    Hae
-                </div>
-
-                <div class="button" onClick=save()>
-                    Rekistöröi
-                </div>
-                
+            <div class="btn save" id="save" onClick=save()>
+                Kirjaa sijainti
             </div>
         </div>
         
     </div>
     
     <script>
-        var afterworkWebservice = 'https://ym8nrjkifa.execute-api.eu-west-1.amazonaws.com/prod/'
-        
+        const afterworkWebservice = 'https://ym8nrjkifa.execute-api.eu-west-1.amazonaws.com/prod/'
+        const header = new Headers();
+        header.append('Content-Type', 'application/json')
+
+        function login() {
+            let uname = document.getElementById("uname").value
+            let pwd = document.getElementById("pwd").value
+
+            document.getElementById("login").setAttribute("style", "display:none");
+            document.getElementById("loader").setAttribute("style", "display:inline-block");
+            
+            fetch(afterworkWebservice + 'login?uname=' + uname + '&pwd=' + pwd, {"headers": header})
+                .then( (response) => {
+                    if (response.status !== 200) {
+                    }
+
+                    // TODO 
+                    response.json().then((data) => {
+                        header.append('x-api-key', data.ApiKey);
+                    })
+
+                    document.getElementById("loader").setAttribute("style", "display:none");
+                    document.getElementById("afterwork").setAttribute("style", "display:inline-block");
+
+                })
+                .catch((err) => {
+                    console.log('Login error: ', err);
+                });
+        }
+
         function geo() {
             if ("geolocation" in navigator) {
-                
-                document.getElementById("button").setAttribute("style", "display:none");
+                console.log('Getting location');
+
+                document.getElementById("afterwork").setAttribute("style", "display:none");
                 document.getElementById("loader").setAttribute("style", "display:inline-block");
 
                 navigator.geolocation.getCurrentPosition(function (location) {
@@ -57,9 +95,9 @@
         }
 
         function getVenues(coords) {
-            fetch(afterworkWebservice + 'venues?ll=61.496417,23.768726')
-                .then(
-                function (response) {
+            console.log(afterworkWebservice + 'venues?ll=' + coords.latitude + ',' + coords.longitude);
+            fetch(afterworkWebservice + 'venues?ll=' + coords.latitude + ',' + coords.longitude, {"headers": header})
+                .then( (response) => {
                     if (response.status !== 200) {
                         console.log('Looks like there was a problem. Status Code: ' +
                             response.status);
@@ -83,7 +121,7 @@
             });
             console.log(venues)
             document.getElementById("loader").setAttribute("style", "display:none");
-            document.getElementById("list").setAttribute("style", "display:inline-block");
+            document.getElementById("list").setAttribute("style", "display:block");
         }
 
     </script>

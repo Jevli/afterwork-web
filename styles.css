@@ -1,5 +1,5 @@
 body {
-    background-color: darkblue;
+    background-color: #343F68;
 }
 
 .container {
@@ -13,16 +13,35 @@ body {
    left:0; 
 }
 
-.button {
+label {
+    font-size: 3em;
+    color: #FF8551;
+    margin-right: 0.25em
+}
+
+input {
+    float: right;
+    font-size: 3em;
+}
+
+.login {
+    display: block;
+    margin: 1em;
+}
+
+.afterwork {
+    display: none;
+}
+
+.btn {
     margin: auto 0.25em;
     font-size: 3em;
-    background-color: orangered;
+    background-color: #FF8551;
     color: white;
     padding: 0.75em;
     border-radius: 0.75em;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
     cursor: pointer;
 }
 
@@ -32,10 +51,7 @@ body {
 
 .list {
     display: none;
-}
-
-input {
-    font-size: 3em;
+    margin: 1em;
 }
 
 .row {
