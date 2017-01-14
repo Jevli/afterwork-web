@@ -9,6 +9,10 @@
 </head>
 
 <body>
+
+        <div class="failed" id="failed">
+        </div>
+
     <div class="container">
         
         <div class="login" id="login">
@@ -63,11 +67,21 @@
 
                     // TODO 
                     response.json().then((data) => {
-                        header.append('x-api-key', data.ApiKey);
-                    })
+                        if (data.ApiKey) {
+                            header.append('x-api-key', data.ApiKey);
 
-                    document.getElementById("loader").setAttribute("style", "display:none");
-                    document.getElementById("afterwork").setAttribute("style", "display:inline-block");
+                            document.getElementById("loader").setAttribute("style", "display:none");
+                            document.getElementById("afterwork").setAttribute("style", "display:inline-block");
+                            document.getElementById("failed").setAttribute("style", "display:none");
+
+                        } else {
+                            document.getElementById("loader").setAttribute("style", "display:none");
+                            document.getElementById("login").setAttribute("style", "display:inline-block");
+                            document.getElementById("failed").setAttribute("style", "display:block");
+                            document.getElementById("failed").innerHTML = "Login failed"
+
+                        }
+                    })
 
                 })
                 .catch((err) => {
