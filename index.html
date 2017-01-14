@@ -36,6 +36,8 @@
     </div>
     
     <script>
+        var afterworkWebservice = 'https://ym8nrjkifa.execute-api.eu-west-1.amazonaws.com/prod/'
+        
         function geo() {
             if ("geolocation" in navigator) {
                 
@@ -55,7 +57,7 @@
         }
 
         function getVenues(coords) {
-            fetch('https://ym8nrjkifa.execute-api.eu-west-1.amazonaws.com/prod/venues?ll=61.496417,23.768726')
+            fetch(afterworkWebservice + 'venues?ll=61.496417,23.768726')
                 .then(
                 function (response) {
                     if (response.status !== 200) {
