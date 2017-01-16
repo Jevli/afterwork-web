@@ -15,9 +15,11 @@
 <body>
 
     <div class="failed" id="failed">
+        <div class="msg" id="msg"></div>
+        <button class="failButton" onclick="toggleError('')">Ok</button>
     </div>
 
-    <div class="container">
+    <div class="container" id="container">
         
         <div class="login" id="login">
             <div class="row">
@@ -35,6 +37,20 @@
 
         <div class="btn afterwork" id="afterwork" onClick=geo()>
             Olen afterworkilla
+        </div>
+
+        <div class="searchVenues" id="searchVenues">
+            <div class="row">
+                <label>Kaupunki</label>
+                <input type="text" id="city" />
+            </div>
+            <div class="row">
+                <label>Paikka</label>
+                <input type="text" id="venue" />
+            </div>
+            <div class="btn save" id="search" onclick=getVenues()>
+                Etsi paikkoja
+            </div>
         </div>
 
         <div class="loader" id="loader"></div>
@@ -69,27 +85,21 @@
             fetch(afterworkWebservice + 'login?uname=' + uname + '&pwd=' + pwd, {"headers": header})
                 .then( (response) => {
                     if (response.status !== 200) {
+                        console.log("Reponse failure: ", response);
                     }
-
-                    // TODO 
+                     
                     response.json().then((data) => {
                         if (data.ApiKey) {
                             header.append('x-api-key', data.ApiKey);
-                            console.log(header);
-
                             userName = uname;
                             
                             switchState("loader", "afterwork");
-                            document.getElementById("failed").setAttribute("style", "display:none");
-
+                            toggleError("");
                         } else {
                             switchState("loader", "login");
-                            document.getElementById("failed").setAttribute("style", "display:block");
-                            document.getElementById("failed").innerHTML = "Login failed"
-
+                            toggleError("Login failed");
                         }
                     })
-
                 })
                 .catch((err) => {
                     console.log('Login error: ', err);
@@ -100,21 +110,31 @@
             if ("geolocation" in navigator) {
                 switchState("afterwork", "loader");
 
-                navigator.geolocation.getCurrentPosition(function (location) {
-                    console.log("Get Venues");
+                navigator.geolocation.getCurrentPosition((location) => {
                     getVenues(location.coords);
+                }, (error) => {
+                    console.log('Geolocation error: ', error);
+                    switchState("loader", "searchVenues");
                 });
 
             } else {
-
                 console.log("Can't locate you!");
-
             }
         }
 
         function getVenues(coords) {
-            console.log(afterworkWebservice + 'venues?ll=' + coords.latitude + ',' + coords.longitude);
-            fetch(afterworkWebservice + 'venues?ll=' + coords.latitude + ',' + coords.longitude, {"headers": header})
+            let query = afterworkWebservice + 'venues?';
+            if (coords) {
+                query += 'll=' + coords.latitude + ',' + coords.longitude;
+            } else {
+                let city = document.getElementById('city').value;
+                let place = document.getElementById('venue').value;
+
+                query += 'near=' + city + '&query=' + place;
+                switchState("searchVenues", "loader");
+            }
+
+            fetch(query , {"headers": header})
                 .then( (response) => {
                     if (response.status !== 200) {
                         console.log('Looks like there was a problem. Status Code: ' +
@@ -122,17 +142,18 @@
                         return;
                     }
 
-                    response.json().then(function (data) {
+                    response.json().then( (data) => {
                         showPossibilities(data);
                     });
                 })
-                .catch(function (err) {
+                .catch( (err) => {
                     console.log('Fetch error: ', err);
                 })
         }
 
         function showPossibilities(venues) {
             venuesList = venues;
+            console.log(venues);
             venues.map((venue) => {
                 let node = document.createElement("OPTION");
                 node.setAttribute("value", venue.name);
@@ -172,6 +193,18 @@
         function switchState(curr, next) {
             document.getElementById(curr).setAttribute("style", "display:none");
             document.getElementById(next).setAttribute("style", "display:block");
+        }
+
+        function toggleError(msg, elem) {
+            if (msg === "") {
+                document.getElementById("container").className = 'container';                
+                document.getElementById("failed").setAttribute("style", "display:none");
+            }
+            else {
+                document.getElementById("failed").setAttribute("style", "display:block");
+                document.getElementById("container").className += ' failingMode';
+            }
+            document.getElementById("failed").getElementsByClassName('msg')[0].innerHTML = msg;
         }
 
     </script>

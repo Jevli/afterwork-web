@@ -1,38 +1,61 @@
 body {
     background-color: #343F68;
+    color: #FF8551;
 }
 
 .container {
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   position:absolute;
-   top:0;
-   bottom:0;
-   right:0;
-   left:0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
 }
 
 .failed {
-    font-size: 4em;
-    color: red;
+    font-size: 2em;
+    background-color: red;
+    color: white;
     font-weight: bold;
     display: none;
     border-style: solid;
+    border-color: red;
     border-width: 2px;
+    border-radius: 0.75em;
     padding: 1em;
-    text-align: center;
+    margin: 5em 1em;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index:1000;
+}
+
+.failButton {
+    font-size: 1em;
+    border-radius: 0.5em;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.failingMode {
+    pointer-events:none;
+    opacity: 0.5;
 }
 
 label {
-    font-size: 3em;
-    color: #FF8551;
-    margin-right: 0.25em
+    font-size: 2em;
+    flex: 1;
+    margin-right: 0.5em
 }
 
 input {
     float: right;
-    font-size: 3em;
+    font-size: 2em;
 }
 
 .login {
@@ -44,9 +67,13 @@ input {
     display: none;
 }
 
+.searchVenues {
+    display: none;
+}
+
 .btn {
-    margin: auto 0.25em;
-    font-size: 3em;
+    margin: auto 2em;
+    font-size: 2em;
     background-color: #FF8551;
     color: white;
     padding: 0.75em;
@@ -66,6 +93,7 @@ input {
 }
 
 .row {
+    display: flex;
     margin: 2em;
 }
 
